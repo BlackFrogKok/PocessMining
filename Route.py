@@ -9,6 +9,7 @@ def hours(dt):
 
 def _render_opr_and_compl_time(persons, obedinenie):
     buffer = {}
+    buffer_date = {}
     time_vipols_list = []
     proebishi = 0
     for person in persons:
@@ -20,11 +21,16 @@ def _render_opr_and_compl_time(persons, obedinenie):
                 buffer[opr] += sec(time)
             else:
                 buffer[opr] = sec(time)
+        for opr, time in person.opr_start_date.items():
+            if opr in buffer:
+                buffer_date[opr].append(time)
+            else:
+                buffer_date[opr] = [time]
     if obedinenie:
         buffer['4+1'] = []
         for i in range(len(buffer['4'])):
             buffer['4+1'].append(buffer['4'][i] + buffer['1'][i] + buffer['0'][i])
-    return buffer, time_vipols_list, proebishi
+    return buffer, buffer_date, time_vipols_list, proebishi
 
 
 
@@ -32,7 +38,7 @@ class Route:
     def __init__(self, route, persons, func=lambda x: x, obedinenie=False):
         self.route = route
         self.persons = list(filter(func, persons))
-        self.opr_time, time_vipols_list, self.proebishi = _render_opr_and_compl_time(self.persons, obedinenie)
+        self.opr_time, self.buffer_date, time_vipols_list, self.proebishi = _render_opr_and_compl_time(self.persons, obedinenie)
         self.avr_compl = sum(time_vipols_list) / len(time_vipols_list)
         self.mediana_vipol = median(time_vipols_list)
         self.avr_opr, self.mediana_opr = self._render_avr_mediana_opr()
