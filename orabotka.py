@@ -20,11 +20,16 @@ for j in tqdm(raw_data['ID'].drop_duplicates()):
     puti = '_'.join(route)
 
     opr_time = {}
+    opr_start_date= {}
     for i in range(len(route) - 1):
         if route[i] in opr_time:
             opr_time[route[i]].append(dt.fromisoformat(filtered_df.iloc[i+1]['Время']) - dt.fromisoformat(filtered_df.iloc[i]['Время']))
+            opr_start_date[route[i]].append(dt.fromisoformat(filtered_df.iloc[i]['Время']))
+
         else:
             opr_time[route[i]] = [dt.fromisoformat(filtered_df.iloc[i+1]['Время']) - dt.fromisoformat(filtered_df.iloc[i]['Время'])]
+            opr_start_date[route[i]] = [dt.fromisoformat(filtered_df.iloc[i]['Время'])]
+
 
     person = Person(route,
                     dt.fromisoformat(filtered_df.iloc[0]['Время']),
