@@ -35,6 +35,7 @@ for j in tqdm(raw_data['ID'].drop_duplicates()):
                     dt.fromisoformat(filtered_df.iloc[0]['Время']),
                     dt.fromisoformat(filtered_df.iloc[-1]['Время']),
                     opr_time,
+                    opr_start_date,
                     filtered_df.iloc[0]['Канал'],
                     filtered_df.iloc[0]['Тип страхового случая'],
                     filtered_df.iloc[0]['Тип повреждения'],
