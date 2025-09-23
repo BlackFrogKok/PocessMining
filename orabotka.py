@@ -1,11 +1,12 @@
 from tqdm import tqdm
 import pickle
 import pandas as pd
+from Operation import Operation, OprName
 from datetime import datetime as dt
 
-from puti import Person
+from Person import Person
 
-CACHE_FILE = 'cache2.pkl'
+CACHE_FILE = 'cache3.pkl'
 
 raw_data = pd.read_csv('case_championship_last.csv')
 sobitia = {v:str(k) for k, v in raw_data['Событие'].drop_duplicates().to_dict().items()}
@@ -19,30 +20,25 @@ for j in tqdm(raw_data['ID'].drop_duplicates()):
     route = filtered_df['Событие'].to_list()
     puti = '_'.join(route)
 
-    opr_time = {}
-    opr_start_date= {}
+    operations = {}
     for i in range(len(route) - 1):
-        print(filtered_df.iloc[i+1]['Время'])
-        if route[i] in opr_time:
-            opr_time[route[i]].append(dt.fromisoformat(filtered_df.iloc[i+1]['Время']) - dt.fromisoformat(filtered_df.iloc[i]['Время']))
-            opr_start_date[route[i]].append(dt.fromisoformat(filtered_df.iloc[i]['Время']))
+        operations[OprName(route[i]).name] = Operation(
+            id=OprName(route[i]).name,
+            time_start=dt.fromisoformat(filtered_df.iloc[i]['Время']) ,
+            time_end=dt.fromisoformat(filtered_df.iloc[i+1]['Время']),
+            employee="",
+            grade=""
+        )
 
-        else:
-            opr_time[route[i]] = [dt.fromisoformat(filtered_df.iloc[i+1]['Время']) - dt.fromisoformat(filtered_df.iloc[i]['Время'])]
-            opr_start_date[route[i]] = [dt.fromisoformat(filtered_df.iloc[i]['Время'])]
-
-
-    person = Person(route,
-                    dt.fromisoformat(filtered_df.iloc[0]['Время']),
-                    dt.fromisoformat(filtered_df.iloc[-1]['Время']),
-                    opr_time,
-                    opr_start_date,
-                    filtered_df.iloc[0]['Канал'],
-                    filtered_df.iloc[0]['Тип страхового случая'],
-                    filtered_df.iloc[0]['Тип повреждения'],
-                    filtered_df.iloc[0]['Место происшествия'],
-                    filtered_df.iloc[0]['Сумма ущерба'],
-                    filtered_df.iloc[0]['Оценка удовлетворённости клиента']
+    person = Person(time_start=dt.fromisoformat(filtered_df.iloc[0]['Время']),
+                    time_end=dt.fromisoformat(filtered_df.iloc[-1]['Время']),
+                    operations=operations,
+                    chanel=filtered_df.iloc[0]['Канал'],
+                    type_strah=filtered_df.iloc[0]['Тип страхового случая'],
+                    damage=filtered_df.iloc[0]['Тип повреждения'],
+                    place=filtered_df.iloc[0]['Место происшествия'],
+                    summ=filtered_df.iloc[0]['Сумма ущерба'],
+                    grade=filtered_df.iloc[0]['Оценка удовлетворённости клиента']
                     )
 
     if puti in putis:
