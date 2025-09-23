@@ -18,6 +18,6 @@ class Person:
         self.summ = summ
         self.grade = grade
 
-    def is_poebal(self):
+    def is_over_limit(self):
         return self.time_vipol >= timedelta(days=2)
 
