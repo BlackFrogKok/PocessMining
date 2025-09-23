@@ -14,7 +14,7 @@ def _render_opr_and_compl_time(persons, obedinenie):
     proebishi = 0
     for person in persons:
         time_vipols_list.append(hours(person.time_vipol))
-        if person.is_poebal():
+        if person.is_over_limit():
             proebishi += 1
         for opr, time in person.opr_time.items():
             if opr in buffer:
@@ -38,13 +38,13 @@ class Route:
     def __init__(self, route, persons, func=lambda x: x, obedinenie=False):
         self.route = route
         self.persons = list(filter(func, persons))
-        self.opr_time, self.opr_date, time_vipols_list, self.proebishi = _render_opr_and_compl_time(self.persons, obedinenie)
-        self.avr_compl = sum(time_vipols_list) / len(time_vipols_list)
-        self.mediana_vipol = median(time_vipols_list)
-        self.avr_opr, self.mediana_opr = self._render_avr_mediana_opr()
-        self.fraction = {k:(v / sum(self.avr_opr.values())) for k, v in self.avr_opr.items()}
-        self.max_fraction_opr = max(self.fraction, key=self.fraction.get)
-        self.dev_opr = self._render_deviation()
+        #self.opr_time, self.opr_date, time_vipols_list, self.proebishi = _render_opr_and_compl_time(self.persons, obedinenie)
+        ##self.avr_compl = sum(time_vipols_list) / len(time_vipols_list)
+        #self.mediana_vipol = median(time_vipols_list)
+        #self.avr_opr, self.mediana_opr = self._render_avr_mediana_opr()
+        #self.fraction = {k:(v / sum(self.avr_opr.values())) for k, v in self.avr_opr.items()}
+        #self.max_fraction_opr = max(self.fraction, key=self.fraction.get)
+        #self.dev_opr = self._render_deviation()
         
     def _render_avr_mediana_opr(self):
         avr_opr = {}

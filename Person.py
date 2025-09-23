@@ -10,7 +10,6 @@ class Person:
                  chanel, type_strah, damage, place, summ, grade):
         self.time_start = time_start
         self.time_vipol = (time_end - time_start)
-
         self.operations = operations
 
         self.chanel = chanel
