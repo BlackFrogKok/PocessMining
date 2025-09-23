@@ -22,6 +22,7 @@ for j in tqdm(raw_data['ID'].drop_duplicates()):
     opr_time = {}
     opr_start_date= {}
     for i in range(len(route) - 1):
+        print(filtered_df.iloc[i+1]['Время'])
         if route[i] in opr_time:
             opr_time[route[i]].append(dt.fromisoformat(filtered_df.iloc[i+1]['Время']) - dt.fromisoformat(filtered_df.iloc[i]['Время']))
             opr_start_date[route[i]].append(dt.fromisoformat(filtered_df.iloc[i]['Время']))

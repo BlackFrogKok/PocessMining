@@ -23,9 +23,9 @@ def _render_opr_and_compl_time(persons, obedinenie):
                 buffer[opr] = sec(time)
         for opr, time in person.opr_start_date.items():
             if opr in buffer:
-                buffer_date[opr] += [(time[i], opr_time[opr][i]) for i in range(len(opr_time[opr]))]
+                buffer_date[opr] += [(time[i], opr.opr_time[opr][i]) for i in range(len(opr.opr_time[opr]))]
             else:
-                buffer_date[opr] = [(time[i], opr_time[opr][i]) for i in range(len(opr_time[opr]))]
+                buffer_date[opr] = [(time[i], opr.opr_time[opr][i]) for i in range(len(opr.opr_time[opr]))]
     if obedinenie:
         buffer['4+1'] = []
         for i in range(len(buffer['4'])):
@@ -45,12 +45,6 @@ class Route:
         self.fraction = {k:(v / sum(self.avr_opr.values())) for k, v in self.avr_opr.items()}
         self.max_fraction_opr = max(self.fraction, key=self.fraction.get)
         self.dev_opr = self._render_deviation()
-
-    def _render(self):
-        for opr, times in self.opr_time.items():
-            avr_opr[opr] = sum(times) / len(times)
-            mediana_opr[opr] = median(times)
-        return avr_opr, mediana_opr
         
     def _render_avr_mediana_opr(self):
         avr_opr = {}
