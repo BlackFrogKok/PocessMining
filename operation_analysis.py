@@ -6,7 +6,7 @@ from pprint import pprint
 import plotly.express as px
 from pprint import pprint
 from Route import hours
-from main import hist_freq
+from utils import hist_opr_time
 
 
 
@@ -30,7 +30,7 @@ all_pers = sum([i.persons for i in org_routes], [])
 all_route = Route('all', all_pers)
 
 
-hist_freq(all_route, 'C')
+hist_opr_time(all_route, 'C')
 
 
 
