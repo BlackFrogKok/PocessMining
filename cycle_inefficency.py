@@ -10,9 +10,6 @@ import plotly.express as px
 def sample_by_month(route):
     groups = {}
     for person in route.persons:
-        # print(person.time_start.month)
-        # print(person.time_start.year)
-        # print('------------------')
         if person.time_start.month > 9:
             time = str(person.time_start.year)+ '.' + str(person.time_start.month)
         else:
@@ -83,7 +80,9 @@ for name, persons in routes.items() :
 inef_routes = {0: [1],
                1: [3],
                6: [1, 2, 3],
-               10: [3, 4, 5]}
+               8: [4],
+               10: [3, 4, 5]
+               }
 
 
 
@@ -92,7 +91,6 @@ for k, v in inef_routes.items():
     times = calc_ineff_time_route(org_routes[k], v)
 
     ineff[org_routes[k].route] = dict(sorted(times.items(), key=lambda item: tuple(map(int, item[0].split('.')))))
-
 
 # for k, v in ineff.items():
 #     print(f'{k}: {sum(v.values())}')
@@ -146,21 +144,27 @@ cost_by_month = {}
 for k, v in ineff.items():
     cost_by_month[k] = calc_empl_cost(v, infl=True)
 
-pprint(cost_by_month)
-for k, v in cost_by_month.items():
-    print(f'{k}: {sum([i[0] for i in v.values()])} {sum([i[1] for i in v.values()])} {cost_by_month[k]['2025.02'][2]}')
+# pprint(cost_by_month)
+# for k, v in cost_by_month.items():
+#     print(f'{k}: {sum([i[0] for i in v.values()])} {sum([i[1] for i in v.values()])} {cost_by_month[k]['2025.02'][2]}')
 
 
+# for i in cost_by_month.keys():
+#     df = pd.DataFrame(dict(
+#         months=cost_by_month[i].keys(),
+#         cost=[v[0] for v in cost_by_month[i].values()],
+#         cost_infl=[v[1] for v in cost_by_month[i].values()]
+#     ))
+#     fig = px.line(df, x='months', y=['cost', 'cost_infl'], title=f'Стоимость работника индексируется на ИПЦ',)
+#     fig.update_layout(font=dict(size=15), title_font=dict(size=17))
+#     fig.show()
+#     fig.write_image(f'Стоимость работника по месяцам будет больше с учётом инфляции {i}.png', scale=4)
 
-df = pd.DataFrame(dict(
-    months=cost_by_month['0_1_2_1_4_5_6_7_8_9'].keys(),
-    cost=[v[0] for v in cost_by_month['0_1_2_1_4_5_6_7_8_9'].values()],
-    cost_infl=[v[1] for v in cost_by_month['0_1_2_1_4_5_6_7_8_9'].values()]
-))
-fig = px.line(df, x='months', y=['cost', 'cost_infl'], title='Стоимость работника по месяцам будет больше с учётом инфляции')
-fig.update_layout(font=dict(size=15), title_font=dict(size=17))
-# fig.show()
-# fig.write_image('Стоимость работника по месяцам будет больше с учётом инфляции.png', scale=4)
 
+# 0_1_4_300_343_5_8_9
 
+inef_rare = calc_ineff_time_route(org_routes[8], [4])
+# pprint(inef_rare)
+cost_by_month_rare = calc_empl_cost(inef_rare, infl=True)
+# pprint(cost_by_month_rare)
 

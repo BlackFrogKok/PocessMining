@@ -39,7 +39,7 @@ class Route:
         self.route = route
         self.persons = list(filter(func, persons))
         #self.opr_time, self.opr_date, time_vipols_list, self.proebishi = _render_opr_and_compl_time(self.persons, obedinenie)
-        ##self.avr_compl = sum(time_vipols_list) / len(time_vipols_list)
+        # self.avr_compl = sum([hours(i.time_vipol) for i in self.persons]) / len(self.persons)
         #self.mediana_vipol = median(time_vipols_list)
         #self.avr_opr, self.mediana_opr = self._render_avr_mediana_opr()
         #self.fraction = {k:(v / sum(self.avr_opr.values())) for k, v in self.avr_opr.items()}
@@ -64,6 +64,17 @@ class Route:
             opr_dev[opr] = [i - self.avr_opr[opr] for i in time]
         return opr_dev
 
+
+    def get_operations(self, opr='all'):
+        all_oprs = {}
+        for sl in [i.operations for i in self.persons]:
+            for k, v in sl.items():
+                if opr == 'all' or k == opr:
+                    if k in all_oprs:
+                        all_oprs[k].append(v)
+                    else:
+                        all_oprs[k] = [v]
+        return all_oprs
     def __str__(self):
         return (f'''
         ---------Маршрут {self.route}---------
