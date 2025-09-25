@@ -1,133 +1,54 @@
 import pickle
 import pandas as pd
 import os
-import numpy as np
-from scipy.stats import norm
-from datetime import timedelta
-from Person import Person
-from statistics import median
 from Route import Route
-import plotly.express as px
-from Route import hours
 
 
-abc = 'ABCDEFGHIJKLMNOP'
-OPRS = {'Регистрация претензии': '0',
-        'Проверка документов': '1',
-        'Поиск потерянной документации': '2',
-        'Урегулирование претензии': '4',
-        'Утверждение претензии': '5',
-        'Ремонт автомобиля': '6',
-        'Подготовка итоговой документации': '7',
-        'Закрытие страхового случая': '8',
-        'Обзор произошедшего случая': '9',
-        'Проверка на мошенничество': '12',
-        'Урегулирование объёма убытков': '58',
-        'Получение страховых резервов': '60',
-        'Отправка платежа': '61',
-        'Получение права на предъявление претензий от страхователя': '111',
-        'Отклонение претензии': '300',
-        'Предъявление апелляции по претензии': '343'}
-OPRS_LETTERS = {}
-for i in zip(OPRS.values(), list(abc)):
-    OPRS_LETTERS[i[0]] = i[1]
-
-
-def num_to_let(route_name):
-    return '_'.join([OPRS_LETTERS[i] for i in route_name.split('_')])
-
-
-
-
-
-
-
-CACHE_FILE = 'cache2.pkl'
-raw_data = pd.read_csv('case_championship_last.csv')
-events = raw_data['Событие'].drop_duplicates().to_dict()
-events['4+1'] = 'Ебаная хуйня'
-events_list = (raw_data['Событие'].drop_duplicates().to_list())
-mests = raw_data['Место происшествия'].drop_duplicates().to_list()
-
-
+CACHE_FILE = 'cache3.pkl'
 routes = {}
 if os.path.getsize(CACHE_FILE) > 0:
     with open(CACHE_FILE, 'rb') as f:
         routes = pickle.load(f)
-
-
-
 org_routes = []
-long_opr = []
-
 all_pers = []
-
 for i in routes.values():
     all_pers += i
-
 for name, persons in routes.items() :
     r = Route(name, persons)
     org_routes.append(r)
 
 
-# ofice = Route('ofice', all_pers.copy(), lambda x: x.chanel == 'Офис')
-# online = Route('online', all_pers.copy(), lambda x: x.chanel == 'Сайт')
-# telephone = Route('telephone', all_pers.copy(), lambda x: x.chanel == 'Телефон')
-# email = Route('email', all_pers.copy(), lambda x: x.chanel == 'Электронная почта')
+
+# индексы циклических путей: 0 1 6 10
+
+
+# Количество нарушений SLA всего
 all_routes = Route('all', all_pers.copy())
+cycle_routes = [org_routes[0], org_routes[1], org_routes[6], org_routes[10]]
 
-correct_routes = Route('correct', all_pers.copy(), lambda x: '_'.join(x.route_names) == '0_1_4_5_6_7_8_9' or '_'.join(x.route_names) == '0_1_4_5_111_6_7_8_9' or '_'.join(x.route_names) == '0_1_4_58_5_60_61_8_9' or '_'.join(x.route_names) == '0_1_4_300_343_5_8_9' or '_'.join(x.route_names) == '0_1_12_4_5_6_7_8_9', obedinenie=True)
+sla_fail = 0
+for i in all_routes.persons:
+    if i.is_over_limit():
+        sla_fail += 1
+print(f'Всего нарушений SLA: {sla_fail}')
 
-r1 = Route('correct', all_pers.copy(), lambda x: '_'.join(x.route_names) == '0_1_4_5_6_7_8_9')
-r2 = Route('correct', all_pers.copy(), lambda x: '_'.join(x.route_names) == '0_1_4_5_111_6_7_8_9')
-r3 = Route('correct', all_pers.copy(), lambda x: '_'.join(x.route_names) == '0_1_4_58_5_60_61_8_9')
-r4 = Route('correct', all_pers.copy(), lambda x: '_'.join(x.route_names) == '0_1_4_300_343_5_8_9')
-r5 = Route('correct', all_pers.copy(), lambda x: '_'.join(x.route_names) == '0_1_12_4_5_6_7_8_9')
-
-# huiny = 0
-#
-# for i in [r1, r2, r3, r4, r5]:
-#     summ_2 = 0
-#     for j in i.persons[0].route_names:
-#         if j == '0' or j == '1' or j == '4' or j == '5' or j == '9':
-#             continue
-#
-#         summ_5 = 0
-#         for l in i.dev_opr[j]:
-#             summ_5 += (l/i.avr_opr[j])**2
-#         summ_2 += (summ_5/(len(i.dev_opr[j]) - 1))
-#     huiny += (summ_2 / (len(i.persons[0].route_names) - 5))
-#
-# ll = (huiny/5)
+# количество нарушений SLA в циклах
+cycle_routes = Route('cycle', [i.persons for i in cycle_routes])
+sla_fail_cycles = 0
+for i in cycle_routes.persons:
+    if i.is_over_limit():
+        sla_fail_cycles += 1
+print(f'Нарушений SLA в циклах: {sla_fail_cycles}')
 
 
 
-
-#hist_opr_prob(org_routes)
-# summ=0
-# for i in correct_routes.dev_opr['4+1']:
-#     summ += (i/correct_routes.avr_opr['4+1'])**2
-#
-# kkk = (summ / (len(correct_routes.dev_opr['4+1'])-1))
-
-
-#
-# print((kkk + ll) / 2)
-# print(kkk)
-#
 
 
 # 0 1 6 10
-cycle_routes = [org_routes[0], org_routes[1], org_routes[6], org_routes[10]]
 
 
 
 
-# fig = px.histogram(x=all_routes.opr_time['4'], histnorm='probability density')
-#
-# fig.show()
-# example_route = Route(org_routes[2].route, org_routes[2].persons, obedinenie=True)
-# print(example_route)
 
 #
 # sigma14 = sum(list(map(abs, example_route.dev_opr['4+1']))) / len(list(map(abs, example_route.dev_opr['4+1'])))
@@ -202,12 +123,7 @@ cycle_routes = [org_routes[0], org_routes[1], org_routes[6], org_routes[10]]
 # fig.write_image('Распределение экземпляров по времени выполнения.png')
 
 
-# df = pd.DataFrame(dict(
-#     routes = [num_to_let(i.route) for i in org_routes],
-#     count = [len(i.persons) for i in org_routes]
-# ))
-# fig = px.histogram(df, x="routes", y="count", title='Распределение клиентов по путям')
-# fig.write_image('Распределение клиентов по путям.png')
+
 
 
 

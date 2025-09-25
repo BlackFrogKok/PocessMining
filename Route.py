@@ -101,14 +101,14 @@ class Route:
         return inefficiency_by_month
 
 
-    def hist_opr_time(self, opr, write_file=False):
+    def hist_opr_time(self, opr, write=False):
         df = pd.DataFrame(dict(
             hours=[i.time for i in self.get_operations(opr=opr)[opr]]
         ))
 
         fig = px.histogram(df, x='hours', nbins=40, title=f'Время операции {opr} непостоянно')
         fig.show()
-        if write_file:
+        if write:
             fig.write_image(f'Время операции {opr} непостоянно.png')
 
 
