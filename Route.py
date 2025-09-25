@@ -41,7 +41,6 @@ class Route:
     def __init__(self, route, persons, func=lambda x: x, obedinenie=False):
         self.route = route
         self.persons = list(filter(func, persons))
-        #self.opr_time, self.opr_date, time_vipols_list, self.proebishi = _render_opr_and_compl_time(self.persons, obedinenie)
         # self.avr_compl = sum([hours(i.time_vipol) for i in self.persons]) / len(self.persons)
         #self.mediana_vipol = median(time_vipols_list)
         #self.avr_opr, self.mediana_opr = self._render_avr_mediana_opr()
