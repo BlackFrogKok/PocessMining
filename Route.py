@@ -24,10 +24,10 @@ def _render_opr_and_compl_time(persons, obedinenie):
             else:
                 buffer[id] = opr.time
     if obedinenie:
-        obedinenie = obedinenie.split('+')
+        opr_list = obedinenie.split('+')
         buffer[obedinenie] = []
         for i in range(len(buffer[obedinenie[0]])):
-            buffer[obedinenie].append(sum(buffer[j][i] for j in obedinenie))
+            buffer[obedinenie].append(sum(buffer[j][i] for j in opr_list))
     return buffer, time_vipols_list, proebishi
 
 
