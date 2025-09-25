@@ -4,17 +4,14 @@ import os
 from Route import Route
 from pprint import pprint
 import plotly.express as px
-from cycle_inefficency import sample_persons_by_month, clac_cycle_ineff_time_person, calc_cycle_ineff_time_route, calc_empl_cost
+from cycle_inefficency import clac_cycle_ineff_time_person, calc_cycle_ineff_time_route, calc_empl_cost
 from pprint import pprint
 from Route import hours
 
 
 
 CACHE_FILE = 'cache3.pkl'
-raw_data = pd.read_csv('case_championship_last.csv')
-events = raw_data['Событие'].drop_duplicates().to_dict()
-events_list = (raw_data['Событие'].drop_duplicates().to_list())
-mests = raw_data['Место происшествия'].drop_duplicates().to_list()
+
 
 routes = {}
 if os.path.getsize(CACHE_FILE) > 0:
@@ -32,7 +29,7 @@ f = open('dev_ideal_person.txt', 'r')
 dev_ideal = [float(i.replace(',', '.')) for i in f.read().splitlines()]
 ideal_route_pers = {}
 i = 0
-for k, v in sample_persons_by_month(ideal_route).items():
+for k, v in ideal_route.sample_persons_by_month.items():
     ideal_route_pers[k] = len(v) * dev_ideal[i]
     i+=1
 
@@ -56,7 +53,7 @@ for k, v in cost.items():
 
 
 
-ideal_route_pers2 = sample_persons_by_month(ideal_route)
+ideal_route_pers2 = ideal_route.sample_persons_by_month()
 for k, v in ideal_route_pers2.items():
     ideal_route_pers2[k] = sum([hours(i.time_vipol) for i in v]) / len(v)
 
@@ -84,7 +81,7 @@ every_by_month = dict(sorted(every_by_month.items(), key=lambda item: int(item[0
 #     print(str(every_by_month[i]).replace('.', ','))
 
 
-ideal_route_pers_per_month = sample_persons_by_month(ideal_route)
+ideal_route_pers_per_month = ideal_route.sample_persons_by_month()
 for k, v in ideal_route_pers_per_month.items():
     ideal_route_pers_per_month[k] = len(v)
 

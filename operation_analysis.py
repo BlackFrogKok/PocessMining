@@ -6,7 +6,6 @@ from pprint import pprint
 import plotly.express as px
 from pprint import pprint
 from Route import hours
-from utils import hist_opr_time
 from main import num_to_let
 
 

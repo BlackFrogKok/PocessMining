@@ -1,5 +1,8 @@
 from datetime import timedelta
 from statistics import median
+import pandas as pd
+import plotly.express as px
+
 
 def sec(dt):
     return [i.total_seconds() / 3600 for i in dt]
@@ -75,6 +78,47 @@ class Route:
                     else:
                         all_oprs[k] = [v]
         return all_oprs
+
+
+    def sample_persons_by_month(self):
+        groups = {}
+        for person in self.persons:
+            if person.time_start.month > 9:
+                time = str(person.time_start.year) + '.' + str(person.time_start.month)
+            else:
+                time = str(person.time_start.year) + '.0' + str(person.time_start.month)
+
+            if time in groups:
+                groups[time].append(person)
+            else:
+                groups[time] = [person]
+        return groups
+
+    def calc_cycle_ineff_time_route(self, opers_to_calc):
+        inefficiency_by_month = {}
+        groups = self.sample_persons_by_month()
+        for time, persons in groups.items():
+            inefficiency = 0
+            for person in persons:
+                inefficiency += person.clac_cycle_ineff_time_person(opers_to_calc)
+            inefficiency_by_month[time] = inefficiency
+        return inefficiency_by_month
+
+
+    def hist_opr_time(self, opr, write_file=False):
+        df = pd.DataFrame(dict(
+            hours=[i.time for i in self.get_operations(opr=opr)[opr]]
+        ))
+
+        fig = px.histogram(df, x='hours', nbins=40, title=f'Время операции {opr} непостоянно')
+        fig.show()
+        if write_file:
+            fig.write_image(f'Время операции {opr} непостоянно.png')
+
+
+
+
+
     def __str__(self):
         return (f'''
         ---------Маршрут {self.route}---------

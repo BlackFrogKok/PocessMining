@@ -22,3 +22,10 @@ class Person:
     def is_over_limit(self):
         return self.time_vipol >= timedelta(days=2)
 
+    def clac_cycle_ineff_time_person(self, opers_to_calc):
+        inefficiency = 0
+        opers = list(self.operations.keys())
+
+        for i in opers_to_calc:
+            inefficiency += sum([j.time for j in self.operations[opers[i]]])
+        return inefficiency

@@ -6,42 +6,6 @@ from pprint import pprint
 import plotly.express as px
 
 
-
-def sample_persons_by_month(route):
-    groups = {}
-    for person in route.persons:
-        if person.time_start.month > 9:
-            time = str(person.time_start.year)+ '.' + str(person.time_start.month)
-        else:
-            time = str(person.time_start.year) + '.0' + str(person.time_start.month)
-
-        if time in groups:
-            groups[time].append(person)
-        else:
-            groups[time] = [person]
-    return groups
-
-
-def clac_cycle_ineff_time_person(person, opers_to_calc):
-    inefficiency = 0
-    opers = list(person.operations.keys())
-
-    for i in opers_to_calc:
-        inefficiency += sum([j.time for j in person.operations[opers[i]]])
-    return inefficiency
-
-
-def calc_cycle_ineff_time_route(route, opers_to_calc):
-    inefficiency_by_month = {}
-    groups = sample_persons_by_month(route)
-    for time, persons in groups.items():
-        inefficiency = 0
-        for person in persons:
-            inefficiency += clac_cycle_ineff_time_person(person, opers_to_calc)
-        inefficiency_by_month[time] = inefficiency
-    return inefficiency_by_month
-
-
 def calc_empl_cost(inefficiency_by_month, infl=False):
     start_cost = 1
     start_cost_infl = 1
@@ -88,7 +52,7 @@ inef_routes = {0: [1],
 
 ineff = {}
 for k, v in inef_routes.items():
-    times = calc_cycle_ineff_time_route(org_routes[k], v)
+    times = org_routes[k].calc_cycle_ineff_time_route(v)
 
     ineff[org_routes[k].route] = dict(sorted(times.items(), key=lambda item: tuple(map(int, item[0].split('.')))))
 
@@ -171,7 +135,7 @@ for k, v in ineff.items():
 
 # 0_1_4_300_343_5_8_9
 
-inef_rare = calc_cycle_ineff_time_route(org_routes[8], [4])
+inef_rare = org_routes[8].calc_cycle_ineff_time_route([4])
 # pprint(inef_rare)
 cost_by_month_rare = calc_empl_cost(inef_rare, infl=True)
 # pprint(cost_by_month_rare)

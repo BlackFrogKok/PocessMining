@@ -9,7 +9,7 @@ from statistics import median
 from Route import Route
 import plotly.express as px
 from Route import hours
-from utils import hist_opr_time
+
 
 abc = 'ABCDEFGHIJKLMNOP'
 OPRS = {'Регистрация претензии': '0',
@@ -209,14 +209,8 @@ cycle_routes = [org_routes[0], org_routes[1], org_routes[6], org_routes[10]]
 # fig = px.histogram(df, x="routes", y="count", title='Распределение клиентов по путям')
 # fig.write_image('Распределение клиентов по путям.png')
 
-# hist_freq(all_routes, '4')
-# hist_freq(all_routes, '1')
-# hist_freq(all_routes, '0')
-# hist_freq(all_routes, '5')
 
 
 # my_norm(0, 0.042, 0.14)
 
 # 4 1 0 5
-
-hist_opr_time(all_routes, 'A')

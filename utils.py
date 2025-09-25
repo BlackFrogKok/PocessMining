@@ -9,15 +9,6 @@ import plotly.express as px
 
 
 
-def hist_opr_time(route, opr):
-    df = pd.DataFrame(dict(
-        hours = [i.time for i in  route.get_operations(opr=opr)[opr]]
-    ))
-
-    fig = px.histogram(df, x='hours', nbins=40, title=f'Время операции {opr} непостоянно')
-    fig.show()
-    fig.write_image(f'Время операции {opr} непостоянно.png')
-
 
 # def hist_opr_aver(route):
 #     df = pd.DataFrame(dict(
