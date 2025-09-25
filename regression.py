@@ -4,7 +4,7 @@ import os
 from Route import Route
 from pprint import pprint
 import plotly.express as px
-from cycle_inefficency import sample_by_month, clac_ineff_time_person, calc_ineff_time_route, calc_empl_cost
+from cycle_inefficency import sample_persons_by_month, clac_cycle_ineff_time_person, calc_cycle_ineff_time_route, calc_empl_cost
 from pprint import pprint
 from Route import hours
 
@@ -32,16 +32,31 @@ f = open('dev_ideal_person.txt', 'r')
 dev_ideal = [float(i.replace(',', '.')) for i in f.read().splitlines()]
 ideal_route_pers = {}
 i = 0
-for k, v in sample_by_month(ideal_route).items():
+for k, v in sample_persons_by_month(ideal_route).items():
     ideal_route_pers[k] = len(v) * dev_ideal[i]
     i+=1
 
 ideal_route_pers = dict(sorted(ideal_route_pers.items(), key=lambda item: tuple(map(int, item[0].split('.')))))
 
 cost = calc_empl_cost(ideal_route_pers, infl=True)
+# print(cost)
+minutes, cost_empl, alter = 0, 0, cost['2025.02'][2]
+for k, v in cost.items():
+    minutes += v[0]
+    cost_empl += v[1]
+# print(minutes * 60, cost_empl * 60, alter * 60)
 
 
-ideal_route_pers2 = sample_by_month(ideal_route)
+
+
+
+
+
+
+
+
+
+ideal_route_pers2 = sample_persons_by_month(ideal_route)
 for k, v in ideal_route_pers2.items():
     ideal_route_pers2[k] = sum([hours(i.time_vipol) for i in v]) / len(v)
 
@@ -69,7 +84,7 @@ every_by_month = dict(sorted(every_by_month.items(), key=lambda item: int(item[0
 #     print(str(every_by_month[i]).replace('.', ','))
 
 
-ideal_route_pers_per_month = sample_by_month(ideal_route)
+ideal_route_pers_per_month = sample_persons_by_month(ideal_route)
 for k, v in ideal_route_pers_per_month.items():
     ideal_route_pers_per_month[k] = len(v)
 
@@ -86,12 +101,11 @@ for k, v in ideal_route_pers_per_month.items():
 
 
 dev = [0.163, 0.0505]
-pprint(every_by_month2)
+# pprint(ideal_route_pers_per_month)
 
-
-print(f'02: {every_by_month2['02'] * dev[0]}')
-print(f'11: {every_by_month2['11'] * dev[1]}')
-
+#
+print(f'02: {every_by_month2['02'] * dev[0] * 60}')
+print(f'11: {every_by_month2['11'] * dev[1] * 60}')
 
 
 # df = pd.DataFrame(dict(

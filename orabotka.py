@@ -22,13 +22,22 @@ for j in tqdm(raw_data['ID'].drop_duplicates()):
 
     operations = {}
     for i in range(len(route) - 1):
-        operations[OprName(route[i]).name] = Operation(
-            id=OprName(route[i]).name,
-            time_start=dt.fromisoformat(filtered_df.iloc[i]['Время']) ,
-            time_end=dt.fromisoformat(filtered_df.iloc[i+1]['Время']),
-            employee="",
-            grade=""
-        )
+        if OprName(route[i]).name in operations:
+            operations[OprName(route[i]).name].append(Operation(
+                id=OprName(route[i]).name,
+                time_start=dt.fromisoformat(filtered_df.iloc[i]['Время']),
+                time_end=dt.fromisoformat(filtered_df.iloc[i + 1]['Время']),
+                employee=filtered_df.iloc[i]['Имя работника'],
+                grade=""
+            ))
+        else:
+            operations[OprName(route[i]).name] = [Operation(
+                id=OprName(route[i]).name,
+                time_start=dt.fromisoformat(filtered_df.iloc[i]['Время']) ,
+                time_end=dt.fromisoformat(filtered_df.iloc[i+1]['Время']),
+                employee=filtered_df.iloc[i]['Имя работника'],
+                grade=""
+            )]
 
     person = Person(time_start=dt.fromisoformat(filtered_df.iloc[0]['Время']),
                     time_end=dt.fromisoformat(filtered_df.iloc[-1]['Время']),

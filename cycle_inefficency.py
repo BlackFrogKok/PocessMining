@@ -7,7 +7,7 @@ import plotly.express as px
 
 
 
-def sample_by_month(route):
+def sample_persons_by_month(route):
     groups = {}
     for person in route.persons:
         if person.time_start.month > 9:
@@ -22,22 +22,22 @@ def sample_by_month(route):
     return groups
 
 
-def clac_ineff_time_person(person, opers_to_calc):
+def clac_cycle_ineff_time_person(person, opers_to_calc):
     inefficiency = 0
     opers = list(person.operations.keys())
 
     for i in opers_to_calc:
-        inefficiency += person.operations[opers[i]].time
+        inefficiency += sum([j.time for j in person.operations[opers[i]]])
     return inefficiency
 
 
-def calc_ineff_time_route(route, opers_to_calc):
+def calc_cycle_ineff_time_route(route, opers_to_calc):
     inefficiency_by_month = {}
-    groups = sample_by_month(route)
+    groups = sample_persons_by_month(route)
     for time, persons in groups.items():
         inefficiency = 0
         for person in persons:
-            inefficiency += clac_ineff_time_person(person, opers_to_calc)
+            inefficiency += clac_cycle_ineff_time_person(person, opers_to_calc)
         inefficiency_by_month[time] = inefficiency
     return inefficiency_by_month
 
@@ -80,7 +80,7 @@ for name, persons in routes.items() :
 inef_routes = {0: [1],
                1: [3],
                6: [1, 2, 3],
-               8: [4],
+               8: [3, 4],
                10: [3, 4, 5]
                }
 
@@ -88,7 +88,7 @@ inef_routes = {0: [1],
 
 ineff = {}
 for k, v in inef_routes.items():
-    times = calc_ineff_time_route(org_routes[k], v)
+    times = calc_cycle_ineff_time_route(org_routes[k], v)
 
     ineff[org_routes[k].route] = dict(sorted(times.items(), key=lambda item: tuple(map(int, item[0].split('.')))))
 
@@ -145,10 +145,18 @@ for k, v in ineff.items():
     cost_by_month[k] = calc_empl_cost(v, infl=True)
 
 # pprint(cost_by_month)
+# cycle_inef_cost = [0, 0, 0]
+# print('                      минуты    с учётом инфляции  алтернативные издержки')
 # for k, v in cost_by_month.items():
-#     print(f'{k}: {sum([i[0] for i in v.values()])} {sum([i[1] for i in v.values()])} {cost_by_month[k]['2025.02'][2]}')
+#     cycle_inef_cost[0] += sum([i[0] for i in v.values()]) * 60
+#     cycle_inef_cost[1] += sum([i[1] for i in v.values()]) * 60
+#     cycle_inef_cost[2] += cost_by_month[k]['2025.02'][2] * 60
+#
+#     print(f'{k}: {sum([i[0] for i in v.values()]) * 60} {sum([i[1] for i in v.values()]) * 60} {cost_by_month[k]['2025.02'][2] * 60}')
+# # print(*cycle_inef_cost)
 
 
+#график фин неэфф для циклических маршрутов
 # for i in cost_by_month.keys():
 #     df = pd.DataFrame(dict(
 #         months=cost_by_month[i].keys(),
@@ -163,7 +171,7 @@ for k, v in ineff.items():
 
 # 0_1_4_300_343_5_8_9
 
-inef_rare = calc_ineff_time_route(org_routes[8], [4])
+inef_rare = calc_cycle_ineff_time_route(org_routes[8], [4])
 # pprint(inef_rare)
 cost_by_month_rare = calc_empl_cost(inef_rare, infl=True)
 # pprint(cost_by_month_rare)

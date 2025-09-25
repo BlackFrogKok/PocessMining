@@ -9,6 +9,7 @@ from statistics import median
 from Route import Route
 import plotly.express as px
 from Route import hours
+from utils import hist_opr_time
 
 abc = 'ABCDEFGHIJKLMNOP'
 OPRS = {'Регистрация претензии': '0',
@@ -162,6 +163,15 @@ cycle_routes = [org_routes[0], org_routes[1], org_routes[6], org_routes[10]]
 #     fig.write_image(f'Количество клиентов в зацикленном пути {num_to_let(i.route)}.png')
 
 
+# Совмещение двух графиков
+# df = pd.DataFrame(dict(
+#     routes = [num_to_let(cycle_routes[0].route), num_to_let(cycle_routes[2].route)],
+#     count = [len(cycle_routes[0].persons), len(cycle_routes[2].persons)]
+# ))
+# fig = px.histogram(df, x="routes", y="count", title=f'Количество клиентов в зацикленном пути 1')
+# fig.update_layout(bargap=0.7, font=dict(size=15), title_font=dict(size=14))
+# # fig.show()
+# fig.write_image(f'Количество клиентов в зацикленном пути 2.png')
 
 
 
@@ -209,3 +219,4 @@ cycle_routes = [org_routes[0], org_routes[1], org_routes[6], org_routes[10]]
 
 # 4 1 0 5
 
+hist_opr_time(all_routes, 'A')
