@@ -12,42 +12,38 @@ def hours(dt):
 
 def _render_opr_and_compl_time(persons, obedinenie):
     buffer = {}
-    buffer_date = {}
     time_vipols_list = []
     proebishi = 0
     for person in persons:
         time_vipols_list.append(hours(person.time_vipol))
         if person.is_over_limit():
             proebishi += 1
-        for opr, time in person.opr_time.items():
-            if opr in buffer:
-                buffer[opr] += sec(time)
+        for id, opr in person.operations.items():
+            if id in buffer:
+                buffer[id] += opr.time
             else:
-                buffer[opr] = sec(time)
-        for opr, time in person.opr_start_date.items():
-            if opr in buffer:
-                buffer_date[opr] += [(time[i], opr.opr_time[opr][i]) for i in range(len(opr.opr_time[opr]))]
-            else:
-                buffer_date[opr] = [(time[i], opr.opr_time[opr][i]) for i in range(len(opr.opr_time[opr]))]
+                buffer[id] = opr.time
     if obedinenie:
-        buffer['4+1'] = []
-        for i in range(len(buffer['4'])):
-            buffer['4+1'].append(buffer['4'][i] + buffer['1'][i] + buffer['0'][i])
-    return buffer, buffer_date, time_vipols_list, proebishi
+        obedinenie = obedinenie.split('+')
+        buffer[obedinenie] = []
+        for i in range(len(buffer[obedinenie[0]])):
+            buffer[obedinenie].append(sum(buffer[j][i] for j in obedinenie))
+    return buffer, time_vipols_list, proebishi
 
 
 
 class Route:
-    def __init__(self, route, persons, func=lambda x: x, obedinenie=False):
+    def __init__(self, route, persons, func=lambda x: x, obedinenie=None):
         self.route = route
         self.persons = list(filter(func, persons))
-        #self.opr_time, self.opr_date, time_vipols_list, self.proebishi = _render_opr_and_compl_time(self.persons, obedinenie)
-        # self.avr_compl = sum([hours(i.time_vipol) for i in self.persons]) / len(self.persons)
-        #self.mediana_vipol = median(time_vipols_list)
-        #self.avr_opr, self.mediana_opr = self._render_avr_mediana_opr()
-        #self.fraction = {k:(v / sum(self.avr_opr.values())) for k, v in self.avr_opr.items()}
-        #self.max_fraction_opr = max(self.fraction, key=self.fraction.get)
-        #self.dev_opr = self._render_deviation()
+
+        self.opr_time, time_vipols_list, self.proebishi = _render_opr_and_compl_time(self.persons, obedinenie)
+        self.avr_compl = sum(time_vipols_list) / len(time_vipols_list)
+        self.mediana_vipol = median(time_vipols_list)
+        self.avr_opr, self.mediana_opr = self._render_avr_mediana_opr()
+        self.fraction = {k:(v / sum(self.avr_opr.values())) for k, v in self.avr_opr.items()}
+        self.max_fraction_opr = max(self.fraction, key=self.fraction.get)
+        self.dev_opr = self._render_deviation()
         
     def _render_avr_mediana_opr(self):
         avr_opr = {}
@@ -56,7 +52,7 @@ class Route:
             avr_opr[opr] = sum(times) / len(times)
             mediana_opr[opr] = median(times)
         return avr_opr, mediana_opr
-    
+
     def is_proverka(self):
         i = max(self.fraction, key=self.fraction.get)
         return i, (self.avr_opr[i]) / (self.mediana_opr[i])

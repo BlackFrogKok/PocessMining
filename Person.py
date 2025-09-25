@@ -11,7 +11,7 @@ class Person:
         self.time_start = time_start
         self.time_vipol = (time_end - time_start)
         self.operations = operations
-
+        self.route = "_".join(operations.keys())
         self.chanel = chanel
         self.type_strah = type_strah
         self.damage = damage
